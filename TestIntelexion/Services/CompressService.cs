@@ -20,14 +20,13 @@ namespace TestIntelexion.Services
         public void CompresImageList(List<ImagesFile> listImgs)
         {
             string dirProcess = ConfigurationManager.AppSettings["compressfile"].ToString();
-
             string logfile = ConfigurationManager.AppSettings["logfile"].ToString();
             
-
             DirectoryInfo dirImgs = new DirectoryInfo(dirProcess);
-
             Directory.CreateDirectory($"{dirProcess}/temp");
             DateTime currentDate = DateTime.Now;
+            string destinationDirectory = $"{dirProcess}/{currentDate.ToString("yyyy_MM_dd")}";
+
             string dayofweek = DateUtils.GetDayOfWeek(currentDate);
             Directory.CreateDirectory($"{dirProcess}/temp/{dayofweek}");
             StringBuilder metaFileContent = new StringBuilder();
@@ -40,10 +39,9 @@ namespace TestIntelexion.Services
             });
 
             File.WriteAllText($"{dirProcess}/temp/imgsprocess.meta", metaFileContent.ToString());
-            string pathZipFile = currentDate.ToString("yyyy_MM_dd_HH_mm_ss");
-            ZipFile.CreateFromDirectory($"{dirProcess}/temp", $"{dirProcess}/{pathZipFile}.zip");
-
-            File.WriteAllText($"{logfile}/{pathZipFile}.log", logFileContent.ToString());
+             
+            ZipFile.CreateFromDirectory($"{dirProcess}/temp", $"{destinationDirectory}/{currentDate.ToString("yyyy_MM_dd_HH_mm_ss")}.zip");
+            File.AppendAllText($"{logfile}/ProcessImgs.log", logFileContent.ToString());
 
             Directory.Delete($"{dirProcess}/temp", true);
         }
